@@ -59,7 +59,7 @@ const (
 // Use ParsePublicKey for keys with prepended algorithm.
 func parsePubKey(in []byte, algo string) (pubKey PublicKey, rest []byte, err error) {
 	switch algo {
-	case KeyAlgoRSA:
+	case KeyAlgoRSA, KeyAlgoRSASHA2256, KeyAlgoRSASHA2512:
 		return parseRSA(in)
 	case KeyAlgoDSA:
 		return parseDSA(in)
@@ -71,7 +71,7 @@ func parsePubKey(in []byte, algo string) (pubKey PublicKey, rest []byte, err err
 		return parseED25519(in)
 	case KeyAlgoSKED25519:
 		return parseSKEd25519(in)
-	case CertAlgoRSAv01, CertAlgoDSAv01, CertAlgoECDSA256v01, CertAlgoECDSA384v01, CertAlgoECDSA521v01, CertAlgoSKECDSA256v01, CertAlgoED25519v01, CertAlgoSKED25519v01:
+	case CertAlgoRSAv01, CertAlgoRSASHA2256v01, CertAlgoRSASHA2512v01, CertAlgoDSAv01, CertAlgoECDSA256v01, CertAlgoECDSA384v01, CertAlgoECDSA521v01, CertAlgoSKECDSA256v01, CertAlgoED25519v01, CertAlgoSKED25519v01:
 		cert, err := parseCert(in, certToPrivAlgo(algo))
 		if err != nil {
 			return nil, nil, err
