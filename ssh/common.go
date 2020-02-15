@@ -91,6 +91,8 @@ var supportedCompressions = []string{compressionNone}
 // hashes needed for signature verification.
 var hashFuncs = map[string]crypto.Hash{
 	KeyAlgoRSA:          crypto.SHA1,
+	KeyAlgoRSASHA2256:   crypto.SHA256,
+	KeyAlgoRSASHA2512:   crypto.SHA512,
 	KeyAlgoDSA:          crypto.SHA1,
 	KeyAlgoECDSA256:     crypto.SHA256,
 	KeyAlgoECDSA384:     crypto.SHA384,

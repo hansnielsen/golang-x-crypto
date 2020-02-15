@@ -34,6 +34,8 @@ import (
 // package.
 const (
 	KeyAlgoRSA        = "ssh-rsa"
+	KeyAlgoRSASHA2256 = "rsa-sha2-256"
+	KeyAlgoRSASHA2512 = "rsa-sha2-512"
 	KeyAlgoDSA        = "ssh-dss"
 	KeyAlgoECDSA256   = "ecdsa-sha2-nistp256"
 	KeyAlgoSKECDSA256 = "sk-ecdsa-sha2-nistp256@openssh.com"
