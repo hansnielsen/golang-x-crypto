@@ -69,10 +69,12 @@ var preferredKexAlgos = []string{
 // supportedHostKeyAlgos specifies the supported host-key algorithms (i.e. methods
 // of authenticating servers) in preference order.
 var supportedHostKeyAlgos = []string{
-	CertAlgoRSAv01, CertAlgoDSAv01, CertAlgoECDSA256v01,
+	CertAlgoRSASHA2512v01, CertAlgoRSASHA2256v01, CertAlgoRSAv01,
+	CertAlgoDSAv01, CertAlgoECDSA256v01,
 	CertAlgoECDSA384v01, CertAlgoECDSA521v01, CertAlgoED25519v01,
 
 	KeyAlgoECDSA256, KeyAlgoECDSA384, KeyAlgoECDSA521,
+	KeyAlgoRSASHA2512, KeyAlgoRSASHA2256,
 	KeyAlgoRSA, KeyAlgoDSA,
 
 	KeyAlgoED25519,
