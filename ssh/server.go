@@ -142,6 +142,19 @@ func (s *ServerConfig) AddHostKey(key Signer) {
 			}
 			return
 		}
+	case CertAlgoRSAv01, CertAlgoRSASHA2256v01, CertAlgoRSASHA2512v01:
+		if algorithmSigner, ok := key.(AlgorithmSigner); ok {
+			s.hostKeys[CertAlgoRSAv01] = &defaultAlgorithmSigner{
+				algorithmSigner, SigAlgoRSA,
+			}
+			s.hostKeys[CertAlgoRSASHA2256v01] = &defaultAlgorithmSigner{
+				algorithmSigner, SigAlgoRSASHA2256,
+			}
+			s.hostKeys[CertAlgoRSASHA2512v01] = &defaultAlgorithmSigner{
+				algorithmSigner, SigAlgoRSASHA2512,
+			}
+			return
+		}
 	}
 	s.hostKeys[keyType] = key
 }
