@@ -127,7 +127,23 @@ func (s *ServerConfig) AddHostKey(key Signer) {
 		s.hostKeys = make(map[string]Signer)
 	}
 
-	s.hostKeys[key.PublicKey().Type()] = key
+	keyType := key.PublicKey().Type()
+	switch keyType {
+	case KeyAlgoRSA, KeyAlgoRSASHA2256, KeyAlgoRSASHA2512:
+		if algorithmSigner, ok := key.(AlgorithmSigner); ok {
+			s.hostKeys[KeyAlgoRSA] = &defaultAlgorithmSigner{
+				algorithmSigner, SigAlgoRSA,
+			}
+			s.hostKeys[KeyAlgoRSASHA2256] = &defaultAlgorithmSigner{
+				algorithmSigner, SigAlgoRSASHA2256,
+			}
+			s.hostKeys[KeyAlgoRSASHA2512] = &defaultAlgorithmSigner{
+				algorithmSigner, SigAlgoRSASHA2512,
+			}
+			return
+		}
+	}
+	s.hostKeys[keyType] = key
 }
 
 // cachedPubKey contains the results of querying whether a public key is
