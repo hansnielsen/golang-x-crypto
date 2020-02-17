@@ -64,7 +64,7 @@ type ServerConfig struct {
 	// Config contains configuration shared between client and server.
 	Config
 
-	hostKeys []Signer
+	hostKeys map[string]Signer
 
 	// NoClientAuth is true if clients are allowed to connect without
 	// authenticating.
@@ -123,14 +123,11 @@ type ServerConfig struct {
 // key exists with the same algorithm, it is overwritten. Each server
 // config must have at least one host key.
 func (s *ServerConfig) AddHostKey(key Signer) {
-	for i, k := range s.hostKeys {
-		if k.PublicKey().Type() == key.PublicKey().Type() {
-			s.hostKeys[i] = key
-			return
-		}
+	if s.hostKeys == nil {
+		s.hostKeys = make(map[string]Signer)
 	}
 
-	s.hostKeys = append(s.hostKeys, key)
+	s.hostKeys[key.PublicKey().Type()] = key
 }
 
 // cachedPubKey contains the results of querying whether a public key is
