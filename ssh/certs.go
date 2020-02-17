@@ -425,6 +425,12 @@ func (c *Certificate) SignCert(rand io.Reader, authority Signer) error {
 	}
 	c.SignatureKey = authority.PublicKey()
 
+	if v, ok := authority.(AlgorithmSigner); ok {
+		if v.PublicKey().Type() == KeyAlgoRSA {
+			authority = &defaultAlgorithmSigner{v, SigAlgoRSASHA2512}
+		}
+	}
+
 	sig, err := authority.Sign(rand, c.bytesForSigning())
 	if err != nil {
 		return err
