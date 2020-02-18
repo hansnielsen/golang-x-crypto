@@ -9,6 +9,8 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"fmt"
+	"io"
 	"net"
 	"reflect"
 	"testing"
@@ -224,17 +226,37 @@ func TestHostKeyCert(t *testing.T) {
 	}
 }
 
+type legacyRSASigner struct {
+	Signer
+}
+
+func (s *legacyRSASigner) PublicKey() PublicKey {
+	return s.Signer.PublicKey()
+}
+
+func (s *legacyRSASigner) Sign(rand io.Reader, data []byte) (*Signature, error) {
+	v, ok := s.Signer.(AlgorithmSigner)
+	if !ok {
+		return nil, fmt.Errorf("invalid signer")
+	}
+	return v.SignWithAlgorithm(rand, data, SigAlgoRSA)
+}
+
 func TestCertTypes(t *testing.T) {
 	var testVars = []struct {
 		name   string
 		signer Signer
+		algo   string
 	}{
-		{CertAlgoECDSA256v01, testSigners["ecdsap256"]},
-		{CertAlgoECDSA384v01, testSigners["ecdsap384"]},
-		{CertAlgoECDSA521v01, testSigners["ecdsap521"]},
-		{CertAlgoED25519v01, testSigners["ed25519"]},
-		{CertAlgoRSAv01, testSigners["rsa"]},
-		{CertAlgoDSAv01, testSigners["dsa"]},
+		{CertAlgoECDSA256v01, testSigners["ecdsap256"], ""},
+		{CertAlgoECDSA384v01, testSigners["ecdsap384"], ""},
+		{CertAlgoECDSA521v01, testSigners["ecdsap521"], ""},
+		{CertAlgoED25519v01, testSigners["ed25519"], ""},
+		{CertAlgoRSAv01, testSigners["rsa"], SigAlgoRSASHA2512},
+		{CertAlgoRSAv01, &legacyRSASigner{testSigners["rsa"]}, SigAlgoRSA},
+		{CertAlgoRSAv01, testSigners["rsa-sha2-256"], SigAlgoRSASHA2512},
+		{CertAlgoRSAv01, testSigners["rsa-sha2-512"], SigAlgoRSASHA2512},
+		{CertAlgoDSAv01, testSigners["dsa"], ""},
 	}
 
 	k, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
@@ -280,6 +302,10 @@ func TestCertTypes(t *testing.T) {
 			certSigner, err := NewCertSigner(cert, priv)
 			if err != nil {
 				t.Fatalf("error generating cert signer: %v", err)
+			}
+
+			if m.algo != "" && cert.Signature.Format != m.algo {
+				t.Errorf("expected %q signature format, got %q", m.algo, cert.Signature.Format)
 			}
 
 			config := &ClientConfig{
